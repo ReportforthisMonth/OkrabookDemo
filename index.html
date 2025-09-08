@@ -1,0 +1,300 @@
+import React from "react";
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar } from "recharts";
+import { Calendar, Users, ClipboardCheck, Trophy, Bell, Search, ChevronRight, CheckCircle2, CircleOff, DollarSign, Clock, MapPin, ListChecks } from "lucide-react";
+
+/**
+ * Fix: Replace broken relative imports with sandbox URLs so the preview can resolve the assets.
+ * Also add a safe fallback if an image fails to load.
+ */
+const LOGO_URL = "sandbox:/mnt/data/Okrabook.png";
+const HERO_URL = "sandbox:/mnt/data/ChatGPT Image Sep 8, 2025, 01_58_17 PM.png";
+const FALLBACK_IMG =
+  "data:image/svg+xml;charset=UTF-8," +
+  encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'>\n      <defs>\n        <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>\n          <stop offset='0%' stop-color='#ede9fe'/>\n          <stop offset='100%' stop-color='#dbeafe'/>\n        </linearGradient>\n      </defs>\n      <rect width='1200' height='600' fill='url(#g)'/>\n      <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='system-ui, -apple-system' font-size='36' fill='#6b7280'>OkraBook</text>\n    </svg>`
+  );
+
+// ------ Sample Data ------
+const attendanceTrend = [
+  { week: "W1", pct: 78 },
+  { week: "W2", pct: 84 },
+  { week: "W3", pct: 88 },
+  { week: "W4", pct: 92 },
+  { week: "W5", pct: 90 },
+];
+
+const sessionLoad = [
+  { day: "Mon", sessions: 2 },
+  { day: "Tue", sessions: 3 },
+  { day: "Wed", sessions: 1 },
+  { day: "Thu", sessions: 3 },
+  { day: "Fri", sessions: 2 },
+  { day: "Sat", sessions: 4 },
+  { day: "Sun", sessions: 0 },
+];
+
+const playerAvailability = [
+  { name: "Ali R.", status: "Present" },
+  { name: "Sana K.", status: "Late" },
+  { name: "Bilal M.", status: "Present" },
+  { name: "Haris A.", status: "Absent" },
+  { name: "Nida S.", status: "Present" },
+  { name: "Usman T.", status: "Present" },
+];
+
+const upcoming = [
+  { title: "U12 Technical Drills", when: "Today · 4:00–5:30 PM", where: "Pitch A" },
+  { title: "U16 Tactical Session", when: "Tomorrow · 7:00–8:30 PM", where: "Indoor Arena" },
+  { title: "Goalkeeper Clinic", when: "Fri · 6:00–7:00 PM", where: "Pitch B" },
+];
+
+const tasks = [
+  { label: "Share session plan (U12)", done: true },
+  { label: "Confirm bus for away match", done: false },
+  { label: "Upload attendance report", done: false },
+];
+
+// ------- Lightweight Dev Checks ("tests") -------
+if (typeof window !== "undefined") {
+  // These do not throw; they warn to help debug asset paths in preview.
+  if (!LOGO_URL || !LOGO_URL.includes("/mnt/data/")) {
+    console.warn("[OkraBook] LOGO_URL may be incorrect:", LOGO_URL);
+  }
+  if (!HERO_URL || !HERO_URL.includes("/mnt/data/")) {
+    console.warn("[OkraBook] HERO_URL may be incorrect:", HERO_URL);
+  }
+}
+
+export default function SoccerCoachDashboard() {
+  return (
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Top Bar */}
+      <header className="sticky top-0 z-30 border-b border-gray-100 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <img
+              src={LOGO_URL}
+              alt="OkraBook"
+              className="h-8 w-auto object-contain"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = FALLBACK_IMG;
+              }}
+            />
+            <span className="font-semibold tracking-tight">OkraBook · Coach</span>
+          </div>
+          <div className="ml-auto hidden md:flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                placeholder="Search players, teams, sessions…"
+                className="h-10 w-80 rounded-xl border border-gray-200 pl-9 pr-3 text-sm outline-none focus:ring-4 focus:ring-purple-100"
+              />
+            </div>
+            <button className="h-10 w-10 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-50">
+              <Bell className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero / Banner */}
+      <section className="relative">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+          <div className="overflow-hidden rounded-3xl border border-gray-100 shadow-sm">
+            <div className="grid md:grid-cols-3">
+              <div className="col-span-2 p-6 sm:p-8 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+                <h1 className="text-2xl sm:text-3xl font-bold">Coach Dashboard — Soccer Academy</h1>
+                <p className="mt-2 text-gray-600">Track sessions, player availability, and performance at a glance.</p>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <Badge icon={<Calendar className="h-4 w-4" />} label="3 sessions today" />
+                  <Badge icon={<Users className="h-4 w-4" />} label="62 players" />
+                  <Badge icon={<Trophy className="h-4 w-4" />} label="League: Junior A" />
+                </div>
+              </div>
+              <div className="relative h-40 md:h-full">
+                <img
+                  src={HERO_URL}
+                  alt="Kids playing soccer"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = FALLBACK_IMG;
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-l from-white/80 to-white/0" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Content Grid */}
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column */}
+          <div className="space-y-6 lg:col-span-2">
+            <Card>
+              <CardHeader icon={<ClipboardCheck className="h-5 w-5" />} title="Upcoming Sessions" actionLabel="View all" />
+              <div className="divide-y divide-gray-100">
+                {upcoming.map((s, i) => (
+                  <div key={i} className="flex items-center justify-between py-4">
+                    <div>
+                      <p className="font-medium">{s.title}</p>
+                      <p className="text-sm text-gray-600 flex items-center gap-2">
+                        <Clock className="h-4 w-4" /> {s.when}
+                        <span className="mx-2">•</span>
+                        <MapPin className="h-4 w-4" /> {s.where}
+                      </p>
+                    </div>
+                    <button className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm hover:bg-gray-50">
+                      Open plan <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card>
+              <CardHeader icon={<Users className="h-5 w-5" />} title="Player Availability (Today)" />
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
+                {playerAvailability.map((p, i) => (
+                  <div key={i} className="flex items-center justify-between rounded-2xl border border-gray-100 px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-purple-200 to-indigo-200" />
+                      <div>
+                        <p className="text-sm font-medium">{p.name}</p>
+                        <p className="text-xs text-gray-500">U14 Squad</p>
+                      </div>
+                    </div>
+                    {p.status === "Present" && (
+                      <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600"><CheckCircle2 className="h-4 w-4"/> Present</span>
+                    )}
+                    {p.status === "Absent" && (
+                      <span className="inline-flex items-center gap-1 text-sm font-medium text-rose-600"><CircleOff className="h-4 w-4"/> Absent</span>
+                    )}
+                    {p.status === "Late" && (
+                      <span className="inline-flex items-center gap-1 text-sm font-medium text-amber-600"><Clock className="h-4 w-4"/> Late</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card>
+              <CardHeader icon={<ListChecks className="h-5 w-5" />} title="Coach Tasks" />
+              <ul className="p-4 space-y-3">
+                {tasks.map((t, i) => (
+                  <li key={i} className="flex items-center gap-3">
+                    <input type="checkbox" defaultChecked={t.done} className="h-5 w-5 rounded-md border-gray-300 text-purple-600 focus:ring-purple-500" />
+                    <span className={"text-sm " + (t.done ? "line-through text-gray-400" : "")}>{t.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader icon={<Users className="h-5 w-5" />} title="Squad Overview" />
+              <div className="p-4">
+                <div className="grid grid-cols-3 gap-3">
+                  <Stat number="62" label="Players" />
+                  <Stat number="5" label="Teams" />
+                  <Stat number="12" label="Coaches" />
+                </div>
+                <div className="mt-5 h-40">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={attendanceTrend} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+                      <XAxis dataKey="week" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+                      <YAxis domain={[60, 100]} tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+                      <Tooltip cursor={{ stroke: "#ddd", strokeWidth: 1 }} />
+                      <Line type="monotone" dataKey="pct" stroke="#7c3aed" strokeWidth={3} dot={{ r: 3 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <p className="mt-2 text-xs text-gray-500">Attendance last 5 weeks</p>
+              </div>
+            </Card>
+
+            <Card>
+              <CardHeader icon={<Calendar className="h-5 w-5" />} title="Weekly Session Load" />
+              <div className="p-4 h-40">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={sessionLoad}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f3f3" />
+                    <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+                    <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+                    <Tooltip cursor={{ fill: "#fafafa" }} />
+                    <Bar dataKey="sessions" radius={[8, 8, 8, 8]} fill="#8b5cf6" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+
+            <Card>
+              <CardHeader icon={<DollarSign className="h-5 w-5" />} title="Payments Snapshot" />
+              <div className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Outstanding</span>
+                  <span className="font-semibold">$420</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">This Month</span>
+                  <span className="font-semibold">$2,310</span>
+                </div>
+                <button className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-white text-sm shadow hover:opacity-95">Open Payments</button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </main>
+
+      <footer className="border-t border-gray-100">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 text-sm text-gray-500">
+          © {new Date().getFullYear()} OkraBook · Soccer Academy Coach Dashboard
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+// ------ UI Primitives ------
+function Card({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">{children}</div>
+  );
+}
+
+function CardHeader({ icon, title, actionLabel }: { icon?: React.ReactNode; title: string; actionLabel?: string }) {
+  return (
+    <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b border-gray-100 bg-white">
+      <div className="flex items-center gap-2">
+        {icon && (
+          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-purple-100 to-indigo-100 text-purple-700 flex items-center justify-center">{icon}</div>
+        )}
+        <h3 className="font-semibold">{title}</h3>
+      </div>
+      {actionLabel && (
+        <button className="text-sm text-purple-700 hover:underline inline-flex items-center gap-1">
+          {actionLabel} <ChevronRight className="h-4 w-4" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function Badge({ icon, label }: { icon?: React.ReactNode; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-purple-700 ring-1 ring-purple-200 shadow-sm">{icon} {label}</span>
+  );
+}
+
+function Stat({ number, label }: { number: string | number; label: string }) {
+  return (
+    <div className="rounded-2xl border border-gray-100 p-4 text-center">
+      <div className="text-2xl font-bold tracking-tight">{number}</div>
+      <div className="mt-1 text-xs text-gray-500">{label}</div>
+    </div>
+  );
+}
